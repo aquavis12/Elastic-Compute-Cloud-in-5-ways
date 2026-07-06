@@ -225,7 +225,6 @@ Live cloud training in **Telugu + English + Hindi** · Ongole, Andhra Pradesh
 
 - 🌐 [sv-technologies.in](https://sv-technologies.in)
 - 📺 [youtube.com/@sv-technologies26](https://www.youtube.com/@sv-technologies26)
-- 👨‍🏫 Vishnu Rachapudi — 14x AWS Certified · AWS Community Builder (Security)
 
 ---
 
