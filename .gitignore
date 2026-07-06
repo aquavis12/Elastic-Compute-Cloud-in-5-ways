@@ -1,0 +1,24 @@
+# Terraform
+iac/terraform/.terraform/
+iac/terraform/.terraform.lock.hcl
+iac/terraform/terraform.tfstate
+iac/terraform/terraform.tfstate.backup
+iac/terraform/terraform.tfvars
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# AWS credentials — NEVER commit these
+.aws/
+credentials
+*.pem
+*.ppk
+
+# OS
+.DS_Store
+Thumbs.db
