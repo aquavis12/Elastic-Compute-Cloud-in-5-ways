@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "SV Technologies — EC2 with Nginx on Amazon Linux 2023"
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of your EC2 key pair for SSH access
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t3.micro, t3.small]
+    Description: EC2 instance type
+
+  YourIP:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: "Your IP for SSH access (e.g. 1.2.3.4/32). Default allows all."
+
+Resources:
+  # ── Security Group ─────────────────────────────────────────────
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref YourIP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: nginx-ec2-cf-sg
+
+  # ── EC2 Instance ───────────────────────────────────────────────
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - !GetAtt WebSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: nginx-ec2-cloudformation
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          dnf update -y
+          dnf install -y nginx
+          systemctl enable nginx
+          systemctl start nginx
+          echo "<h1>Hello from EC2!</h1><p>Launched via CloudFormation</p>" > /usr/share/nginx/html/index.html
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref WebServer
+
+  PublicIP:
+    Description: Public IP address
+    Value: !GetAtt WebServer.PublicIp
+
+  WebsiteURL:
+    Description: Open this in your browser
+    Value: !Sub "http://${WebServer.PublicIp}"
